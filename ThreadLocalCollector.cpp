@@ -205,7 +205,7 @@ namespace Auto {
             zone->clear_garbage_checking_count(garbage, count);
         }
         
-		GARBAGE_COLLECTION_COLLECTION_PHASE_BEGIN((auto_zone_t*)_zone, AUTO_TRACE_SCAVENGING_PHASE);
+		//GARBAGE_COLLECTION_COLLECTION_PHASE_BEGIN((auto_zone_t*)_zone, AUTO_TRACE_SCAVENGING_PHASE);
         for (size_t index = 0; index < count; index++) {
             void *block = garbage[index];
             // Only small quantum blocks are currently allocated locally, take advantage of that.
@@ -237,7 +237,7 @@ namespace Auto {
         if (bytes_dropped) {
             _zone->adjust_allocation_counter(bytes_dropped);
         }
-		GARBAGE_COLLECTION_COLLECTION_PHASE_END((auto_zone_t*)_zone, AUTO_TRACE_SCAVENGING_PHASE, (uint64_t)blocks_freed, (uint64_t)bytes_freed);
+		//GARBAGE_COLLECTION_COLLECTION_PHASE_END((auto_zone_t*)_zone, AUTO_TRACE_SCAVENGING_PHASE, (uint64_t)blocks_freed, (uint64_t)bytes_freed);
     }
 
     static void finalize_work(Zone *zone, const size_t garbage_count, void *garbage[]) {
@@ -296,7 +296,7 @@ namespace Auto {
             // no garbage
             // TODO:  if we keep hitting this condition, we could use feedback to increase the thread local threshold.
             _localBlocks.clearFlags();    // clears flags only.
-			GARBAGE_COLLECTION_COLLECTION_END((auto_zone_t*)_zone, 0ull, 0ull, _localBlocks.count(), (uint64_t)(-1));
+			//GARBAGE_COLLECTION_COLLECTION_END((auto_zone_t*)_zone, 0ull, 0ull, _localBlocks.count(), (uint64_t)(-1));
             return;
         }
 
@@ -335,8 +335,8 @@ namespace Auto {
         garbage_list_handler(this);
 
         // skip computing the locals size if the probe is not enabled
-        if (GARBAGE_COLLECTION_COLLECTION_PHASE_END_ENABLED())
-            GARBAGE_COLLECTION_COLLECTION_END((auto_zone_t*)_zone, garbage_count, (uint64_t)scavenged_size, _localBlocks.count(), (uint64_t)_localBlocks.localsSize());
+        //if (GARBAGE_COLLECTION_COLLECTION_PHASE_END_ENABLED())
+        //    GARBAGE_COLLECTION_COLLECTION_END((auto_zone_t*)_zone, garbage_count, (uint64_t)scavenged_size, _localBlocks.count(), (uint64_t)_localBlocks.localsSize());
     }
 
     // Assumes _tlcBuffer/_tlcBufferCount hold the garbage list
@@ -444,7 +444,7 @@ namespace Auto {
                 scanned_size += subzone->size(q);
             }
         }
-        GARBAGE_COLLECTION_COLLECTION_PHASE_END((auto_zone_t*)_zone, AUTO_TRACE_SCANNING_PHASE, (uint64_t)_tlcBufferCount, (uint64_t)scanned_size);
+        //GARBAGE_COLLECTION_COLLECTION_PHASE_END((auto_zone_t*)_zone, AUTO_TRACE_SCANNING_PHASE, (uint64_t)_tlcBufferCount, (uint64_t)scanned_size);
     }
     
     //
@@ -457,9 +457,9 @@ namespace Auto {
         
         _thread.tlc_watchdog_reset();
         
-		GARBAGE_COLLECTION_COLLECTION_BEGIN((auto_zone_t*)_zone, AUTO_TRACE_LOCAL);
+		//GARBAGE_COLLECTION_COLLECTION_BEGIN((auto_zone_t*)_zone, AUTO_TRACE_LOCAL);
         
-		GARBAGE_COLLECTION_COLLECTION_PHASE_BEGIN((auto_zone_t*)_zone, AUTO_TRACE_SCANNING_PHASE);
+		//GARBAGE_COLLECTION_COLLECTION_PHASE_BEGIN((auto_zone_t*)_zone, AUTO_TRACE_SCANNING_PHASE);
 
 #ifdef __BLOCKS__		
         // scan the stack for the first set of hits
@@ -474,9 +474,9 @@ namespace Auto {
         // recurse on what are now the roots
         scan_marked_blocks();
         
-        if (GARBAGE_COLLECTION_COLLECTION_PHASE_END_ENABLED()) {
-            trace_scanning_phase_end();
-        }
+        //if (GARBAGE_COLLECTION_COLLECTION_PHASE_END_ENABLED()) {
+        //    trace_scanning_phase_end();
+        //}
         process_local_garbage(finalizeNow ? finalize_local_garbage_now : finalize_local_garbage_later);
         
         _thread.set_thread_local_collector(NULL);
@@ -484,7 +484,7 @@ namespace Auto {
         if (_localBlocks.count() > local_allocations_size_limit/2)
             _thread.flush_local_blocks();
         
-        AUTO_PROBE(auto_probe_local_collection_complete());
+        //AUTO_PROBE(auto_probe_local_collection_complete());
     }
     
     //
@@ -496,9 +496,9 @@ namespace Auto {
         assert(_thread.suspended());
         _thread.set_thread_local_collector(this);
         
-		GARBAGE_COLLECTION_COLLECTION_BEGIN((auto_zone_t*)_zone, AUTO_TRACE_LOCAL);
+		//GARBAGE_COLLECTION_COLLECTION_BEGIN((auto_zone_t*)_zone, AUTO_TRACE_LOCAL);
         
-		GARBAGE_COLLECTION_COLLECTION_PHASE_BEGIN((auto_zone_t*)_zone, AUTO_TRACE_SCANNING_PHASE);
+		//GARBAGE_COLLECTION_COLLECTION_PHASE_BEGIN((auto_zone_t*)_zone, AUTO_TRACE_SCANNING_PHASE);
         
         scan_range(stack);
         scan_range(registers);
@@ -506,19 +506,19 @@ namespace Auto {
         // recurse on what are now the roots
         scan_marked_blocks();
         
-        if (GARBAGE_COLLECTION_COLLECTION_PHASE_END_ENABLED()) {
-            trace_scanning_phase_end();
-        }
+        //if (GARBAGE_COLLECTION_COLLECTION_PHASE_END_ENABLED()) {
+        //    trace_scanning_phase_end();
+        //}
         
         process_local_garbage(unmark_local_garbage);
         
         _thread.set_thread_local_collector(NULL);
         
-        AUTO_PROBE(auto_probe_local_collection_complete());
+        //AUTO_PROBE(auto_probe_local_collection_complete());
     }
     
     void ThreadLocalCollector::reap_all() {
-        GARBAGE_COLLECTION_COLLECTION_BEGIN((auto_zone_t*)_zone, AUTO_TRACE_LOCAL);
+        //GARBAGE_COLLECTION_COLLECTION_BEGIN((auto_zone_t*)_zone, AUTO_TRACE_LOCAL);
         _thread.set_thread_local_collector(this);
         process_local_garbage(finalize_local_garbage_now);
         _thread.set_thread_local_collector(NULL);

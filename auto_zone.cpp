@@ -29,7 +29,7 @@
 #include "auto_impl_utilities.h"
 #include "auto_weak.h"
 #include "auto_trace.h"
-#include "auto_dtrace.h"
+//#include "auto_dtrace.h"
 #include "Zone.h"
 #include "Locks.h"
 #include "InUseEnumerator.h"
@@ -46,7 +46,7 @@
 #include <sys/types.h>
 #include <sys/event.h>
 #include <sys/time.h>
-#include <msgtracer_client.h>
+//#include <msgtracer_client.h>
 
 #ifdef __BLOCKS__
 #include <Block.h>
@@ -113,7 +113,7 @@ static void auto_collect_internal(Zone *zone, boolean_t generational) {
     // bound the bottom of the stack.
     vm_address_t stack_bottom = auto_get_sp();
     if (zone->control.disable_generational) generational = false;
-	GARBAGE_COLLECTION_COLLECTION_BEGIN((auto_zone_t*)zone, generational ? AUTO_TRACE_GENERATIONAL : AUTO_TRACE_FULL);
+	//GARBAGE_COLLECTION_COLLECTION_BEGIN((auto_zone_t*)zone, generational ? AUTO_TRACE_GENERATIONAL : AUTO_TRACE_FULL);
     zone->set_state(scanning);
     
     Thread &collector_thread = zone->register_thread();
@@ -127,30 +127,30 @@ static void auto_collect_internal(Zone *zone, boolean_t generational) {
     size_t large_garbage_count = zone->large_garbage_count();
     void **large_garbage = (large_garbage_count ? garbage + garbage_count - large_garbage_count : NULL);
 
-    AUTO_PROBE(auto_probe_end_heap_scan(garbage_count, garbage));
+    //AUTO_PROBE(auto_probe_end_heap_scan(garbage_count, garbage));
     
     size_t bytes_freed = 0;
 
     // note the garbage so the write-barrier can detect resurrection
-	GARBAGE_COLLECTION_COLLECTION_PHASE_BEGIN((auto_zone_t*)zone, AUTO_TRACE_FINALIZING_PHASE);
+	//GARBAGE_COLLECTION_COLLECTION_PHASE_BEGIN((auto_zone_t*)zone, AUTO_TRACE_FINALIZING_PHASE);
     zone->set_state(finalizing);
     size_t block_count = garbage_count, byte_count = 0;
     zone->invalidate_garbage(garbage_count, garbage);
-	GARBAGE_COLLECTION_COLLECTION_PHASE_END((auto_zone_t*)zone, AUTO_TRACE_FINALIZING_PHASE, (uint64_t)block_count, (uint64_t)byte_count);
+	//GARBAGE_COLLECTION_COLLECTION_PHASE_END((auto_zone_t*)zone, AUTO_TRACE_FINALIZING_PHASE, (uint64_t)block_count, (uint64_t)byte_count);
     zone->set_state(reclaiming);
-	GARBAGE_COLLECTION_COLLECTION_PHASE_BEGIN((auto_zone_t*)zone, AUTO_TRACE_SCAVENGING_PHASE);
+	//GARBAGE_COLLECTION_COLLECTION_PHASE_BEGIN((auto_zone_t*)zone, AUTO_TRACE_SCAVENGING_PHASE);
     bytes_freed = zone->free_garbage(garbage_count - large_garbage_count, garbage, large_garbage_count, large_garbage, block_count, byte_count);
     zone->clear_zombies();
-	GARBAGE_COLLECTION_COLLECTION_PHASE_END((auto_zone_t*)zone, AUTO_TRACE_SCAVENGING_PHASE, (uint64_t)block_count, (uint64_t)bytes_freed);
+	//GARBAGE_COLLECTION_COLLECTION_PHASE_END((auto_zone_t*)zone, AUTO_TRACE_SCAVENGING_PHASE, (uint64_t)block_count, (uint64_t)bytes_freed);
 
     timer.total_time().stop();
     zone->collect_end(timer, bytes_freed);
     collector_thread.set_in_collector(false);
 
-	GARBAGE_COLLECTION_COLLECTION_END((auto_zone_t*)zone, (uint64_t)garbage_count, (uint64_t)bytes_freed, (uint64_t)zone_stats.count(), (uint64_t)zone_stats.size());
+	//GARBAGE_COLLECTION_COLLECTION_END((auto_zone_t*)zone, (uint64_t)garbage_count, (uint64_t)bytes_freed, (uint64_t)zone_stats.count(), (uint64_t)zone_stats.size());
 
     zone->set_state(idle);
-    AUTO_PROBE(auto_probe_heap_collection_complete());
+    //AUTO_PROBE(auto_probe_heap_collection_complete());
 
     WallClockTimer &idle_timer = zone->statistics().idle_timer();
     if (zone->control.log & AUTO_LOG_TIMINGS) {
@@ -229,7 +229,7 @@ static inline void _decrement_pending_count(Zone *azone, auto_zone_options_t glo
     assert(global_mode < AUTO_ZONE_COLLECT_GLOBAL_MODE_COUNT);
     assert(azone->_pending_collections[global_mode] > 0);
     azone->_pending_collections[global_mode]--;
-    AUTO_PROBE(auto_probe_collection_complete());
+    //AUTO_PROBE(auto_probe_collection_complete());
 }
 
 static void auto_zone_generational_collection(Zone *zone)
@@ -739,9 +739,9 @@ static void _auto_zone_log_usage(void *_unused) {
 #define STRN_EQ(x, y) (strncmp((x), (y), strlen(y)) == 0)
 	if (STRN_EQ(bundle_name, "com.apple.")) return;
 
-	msgtracer_log_with_keys("com.apple.runtime.gcusage", ASL_LEVEL_NOTICE,
-							"com.apple.message.signature", bundle_name,
-							"com.apple.message.summarize", "YES", NULL);
+	//msgtracer_log_with_keys("com.apple.runtime.gcusage", ASL_LEVEL_NOTICE,
+	//						"com.apple.message.signature", bundle_name,
+	//						"com.apple.message.summarize", "YES", NULL);
 }
 
 // there can be several autonomous auto_zone's running, in theory at least.

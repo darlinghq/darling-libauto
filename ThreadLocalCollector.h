@@ -29,7 +29,7 @@
 
 #include "Definitions.h"
 #include "Range.h"
-#include "SubZone.h"
+#include "Subzone.h"
 #include "Zone.h"
 
 namespace Auto {

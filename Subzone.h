@@ -36,7 +36,7 @@
 #import "auto_tester/auto_tester.h"
 #include "auto_zone.h"
 #include "auto_trace.h"
-#include "auto_dtrace.h"
+//#include "auto_dtrace.h"
 #include <cassert>
 
 namespace Auto {
@@ -519,7 +519,7 @@ namespace Auto {
             data |= global_bit | (youngest_age << age_mask_log2);
             _side_data[q] = data;
             AUTO_PROBE(auto_probe_make_global(quantum_address(q), youngest_age));
-            GARBAGE_COLLECTION_AUTO_BLOCK_LOST_THREAD_LOCALITY(quantum_address(q), size(q));
+            //GARBAGE_COLLECTION_AUTO_BLOCK_LOST_THREAD_LOCALITY(quantum_address(q), size(q));
 #ifdef MEASURE_TLC_STATS
             update_block_escaped_stats();
 #endif

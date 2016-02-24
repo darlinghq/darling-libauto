@@ -618,8 +618,8 @@ namespace Auto {
         // clear the block if requested.
         if (clear) clear_block(block, allocated_size);
         
-        if (refcount_is_one)
-            GARBAGE_COLLECTION_AUTO_REFCOUNT_ONE_ALLOCATION(allocated_size);
+        //if (refcount_is_one)
+        //    GARBAGE_COLLECTION_AUTO_REFCOUNT_ONE_ALLOCATION(allocated_size);
         
 #if RECORD_REFCOUNT_STACKS
         if (AUTO_RECORD_REFCOUNT_STACKS) {
@@ -653,10 +653,10 @@ namespace Auto {
             auto_zone_collect((auto_zone_t *)this, AUTO_ZONE_COLLECT_RATIO_COLLECTION|AUTO_ZONE_COLLECT_COALESCE);
         }
 
-        if (count && refcount_is_one && GARBAGE_COLLECTION_AUTO_REFCOUNT_ONE_ALLOCATION_ENABLED()) {
-            for (unsigned i=0; i<count; i++)
-                GARBAGE_COLLECTION_AUTO_REFCOUNT_ONE_ALLOCATION(allocated_size);
-        }
+        //if (count && refcount_is_one && GARBAGE_COLLECTION_AUTO_REFCOUNT_ONE_ALLOCATION_ENABLED()) {
+        //    for (unsigned i=0; i<count; i++)
+        //        GARBAGE_COLLECTION_AUTO_REFCOUNT_ONE_ALLOCATION(allocated_size);
+        //}
                 
         return count;
     }
@@ -1253,7 +1253,7 @@ namespace Auto {
     //
     void Zone::collect(bool is_partial, void *current_stack_bottom, CollectionTimer &timer) {
         
-		GARBAGE_COLLECTION_COLLECTION_PHASE_BEGIN((auto_zone_t*)this, AUTO_TRACE_SCANNING_PHASE);
+		//GARBAGE_COLLECTION_COLLECTION_PHASE_BEGIN((auto_zone_t*)this, AUTO_TRACE_SCANNING_PHASE);
 
 
         // inform mutators that they need to add objects to the enlivening queue while scanning.
@@ -1274,17 +1274,17 @@ namespace Auto {
         if (is_partial) collect_partial(current_stack_bottom, timer);
         else collect_full(current_stack_bottom, timer);
 
-        GARBAGE_COLLECTION_COLLECTION_PHASE_END((auto_zone_t*)this, AUTO_TRACE_SCANNING_PHASE, _stats.blocks_scanned(), _stats.bytes_scanned());
+        //GARBAGE_COLLECTION_COLLECTION_PHASE_END((auto_zone_t*)this, AUTO_TRACE_SCANNING_PHASE, _stats.blocks_scanned(), _stats.bytes_scanned());
 
         scavenge_blocks();
         
         // if weak references are present, threads will still be suspended, resume them after clearing weak references.
         auto_weak_callback_block_t *callbacks = NULL;
         if (has_weak_references()) {
-			GARBAGE_COLLECTION_COLLECTION_PHASE_BEGIN((auto_zone_t*)this, AUTO_TRACE_WEAK_REFERENCE_PHASE);
+			//GARBAGE_COLLECTION_COLLECTION_PHASE_BEGIN((auto_zone_t*)this, AUTO_TRACE_WEAK_REFERENCE_PHASE);
             uintptr_t weak_referents, weak_references;
             callbacks = weak_clear_references(this, _garbage_list.count(), (vm_address_t *)_garbage_list.buffer(), &weak_referents, &weak_references);
-			GARBAGE_COLLECTION_COLLECTION_PHASE_END((auto_zone_t*)this, AUTO_TRACE_WEAK_REFERENCE_PHASE, (uint64_t)weak_referents, (uint64_t)(weak_references * sizeof(void*)));
+			//GARBAGE_COLLECTION_COLLECTION_PHASE_END((auto_zone_t*)this, AUTO_TRACE_WEAK_REFERENCE_PHASE, (uint64_t)weak_referents, (uint64_t)(weak_references * sizeof(void*)));
         }
 
         // Write-Barrier Repair.

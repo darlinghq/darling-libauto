@@ -261,7 +261,7 @@ namespace Auto {
         }
     }
     
-#ifdef DEBUG
+#if defined(DEBUG) || defined(DARLING)
     // In release builds the optimizer knows this never gets called. But we need it to link a debug build.
     template <> void Thread::block_escaped_internal<class LargeBlockRef>(LargeBlockRef block) {
         __builtin_trap();

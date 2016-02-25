@@ -273,7 +273,7 @@ namespace Auto {
         //
         // Allocate many blocks. Returns the count of blocks allocated.
         //
-        unsigned batch_allocate(Thread &thread, size_t &size, const usword_t layout, const bool refcount_is_one, const bool clear, void **results, unsigned num_requested);
+        unsigned batch_allocate(Thread &thread, usword_t &size, const usword_t layout, const bool refcount_is_one, const bool clear, void **results, unsigned num_requested);
 
         //
         // deallocate

@@ -609,7 +609,7 @@ namespace Auto {
         return count;
     }
     
-    unsigned Admin::batch_allocate_from_subzone_no_lock(Subzone *subzone, size_t size, const bool clear, void **results, unsigned num_requested) {
+    unsigned Admin::batch_allocate_from_subzone_no_lock(Subzone *subzone, usword_t size, const bool clear, void **results, unsigned num_requested) {
         // See if we can get a blocks from unused territory
         usword_t top = subzone->allocation_count();
         usword_t unused = subzone->allocation_limit() - top;
@@ -643,7 +643,7 @@ namespace Auto {
         return count;
     }
 
-    unsigned Admin::batch_allocate(Thread &thread, size_t &size, const usword_t layout, const bool refcount_is_one, const bool clear, void **results, unsigned num_requested) {
+    unsigned Admin::batch_allocate(Thread &thread, usword_t &size, const usword_t layout, const bool refcount_is_one, const bool clear, void **results, unsigned num_requested) {
         // if AUTO_USE_GUARDS is on, always take the slow path.
         if (Environment::guard_pages) return 0;
         usword_t n = quantum_count(size);
